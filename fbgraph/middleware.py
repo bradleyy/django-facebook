@@ -1,7 +1,7 @@
 from django.conf import settings
 import facebook
 from django.http import HttpResponseRedirect
-from fbuser.models import FBUser
+from fbgraph.models import FBUser
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login, logout
 from urllib import quote

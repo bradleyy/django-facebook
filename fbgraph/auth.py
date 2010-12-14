@@ -1,5 +1,5 @@
 from django.contrib.auth.backends import ModelBackend
-from fbuser.models import FBUser
+from fbgraph.models import FBUser
 
 class FBAuthBackend(ModelBackend):
 

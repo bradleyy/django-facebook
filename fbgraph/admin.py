@@ -1,4 +1,4 @@
 from django.contrib import admin
-from fbuser.models import FBUser
+from fbgraph.models import FBUser
 
 admin.site.register(FBUser)
