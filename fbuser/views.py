@@ -3,22 +3,29 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
+from django.core.urlresolvers import reverse
 from fbuser.models import FBUser
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from fbuser.forms import *
+from fbuser.util import get_next
 
-# Create your views here.
+
 def fbreg(request):
-    if not hasattr(request, "fbprofile"):
+    next = get_next(request)
+    fbprofile = request.session.get("fbprofile", None)
+    fbgraph = request.session.get("fbgraph", None)
+    if not (fbprofile and fbgraph):
         return HttpResponseRedirect('/')
-    next = request.GET['next']
+    else:
+        if match_fb_id(request):
+            return HttpResponseRedirect(next)
     if request.method == "POST":
         user = User.objects.create_user(request.fbprofile['id'],
                                         '', password=None)
-        user.first_name = request.fbprofile['first_name']
-        user.last_name = request.fbprofile['last_name']
-        user.email = request.fbprofile['email']
+        user.first_name = fbprofile['first_name']
+        user.last_name = fbprofile['last_name']
+        user.email = fbprofile['email']
         user.is_active = True
         user.set_unusable_password()
         user.save()
@@ -27,10 +34,10 @@ def fbreg(request):
         profile.save()
         fbuser = FBUser(
             user=user,
-            uid=request.fbprofile['id'],
-            name=request.fbprofile['name'],
-            profile_url=request.fbprofile['link'],
-            access_token=request.fbcookie['access_token'],
+            uid=fbprofile['id'],
+            name=fbprofile['name'],
+            profile_url=fbprofile['link'],
+            access_token=getattr(fbgraph,'access_token', None),
             )
         fbuser.save()
         return HttpResponseRedirect(next)
@@ -44,7 +51,10 @@ def fbreg(request):
                               context_instance=RequestContext(request)
                               )
 def fblink(request):
-    if not hasattr(request, "fbprofile"):
+    next = get_next(request)
+    fbprofile = request.session.get("fbprofile", None)
+    fbgraph = request.session.get("fbgraph", None)
+    if not (fbprofile and fbgraph):
         return HttpResponseRedirect('/')
     message = ""
     if request.method=="GET":
@@ -61,25 +71,23 @@ def fblink(request):
                         profile.active=True
                         profile.save()
                         try:
-                            user_old = User.objects.get(id=request.fbprofile['id'])
+                            #import rpdb2; rpdb2.start_embedded_debugger('a')
+                            user_old = User.objects.get(id=fbprofile['id'])
                             fbuser = FBUser.objects.get(user=user_old)
-                            for item in user_old.item_set:
-                                item.owner = user
-                                item.save()
                             fbuser.user = user
                             fbuser.save()
                             #TODO: delete user_old
                         except:
                             fbuser = FBUser(
                                 user=user,
-                                uid=request.fbprofile['id'],
-                                name=request.fbprofile['name'],
-                                profile_url=request.fbprofile['link'],
-                                access_token=request.fbcookie['access_token'],
+                                uid=fbprofile['id'],
+                                name=fbprofile['name'],
+                                profile_url=fbprofile['link'],
+                                access_token=getattr(fbgraph,'access_token', None),
                                 )
                             fbuser.save()
                         # Redirect to a success page.
-                        return HttpResponseRedirect(request.GET['next'])
+                        return HttpResponseRedirect(next)
                     else:
                         # Return a 'disabled account' error message
                         pass
