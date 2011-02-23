@@ -6,8 +6,8 @@ class FBAuthBackend(ModelBackend):
     def authenticate(self, uid=None):
         try:
             fbuser = FBUser.objects.get(uid=uid)
-            return fbuser.user
-        except User.DoesNotExist:
+            return fbuser.user 
+        except FBUser.DoesNotExist:
             return None
         return None
 

@@ -7,8 +7,8 @@ def FacebookApiKey(request):
         return {}
 
 def FacebookProfile(request):
-    fbprofile = request.session.get("fbprofile", None)
-    if fbprofile:
-        return {'facebook_profile': fbprofile }
+     fbprofile = request.session.get("fbprofile", None)
+     if fbprofile:
+         return {'facebook_profile': fbprofile }
     else:
         return {}

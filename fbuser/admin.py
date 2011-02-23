@@ -1,4 +1,8 @@
 from django.contrib import admin
-from fbgraph.models import FBUser
+from fbuser.models import FBUser
 
-admin.site.register(FBUser)
+class FBUserAdmin(admin.ModelAdmin):
+	list_display = ('user', 'uid', 'name',)
+
+admin.site.register(FBUser, FBUserAdmin)
+
