@@ -1,0 +1,50 @@
+{% extends "master.html" %}
+
+{% block content %}
+	    <div>
+		{% if message %}
+		<p class="errortext">{{message}}</p>
+		{% endif %}
+	      </div>
+	    <form action="" class="text_field" method="post">
+            {% csrf_token %}
+		  <div class="grid_6" id="content">
+				<table id="regtable" >
+					{%if form%}
+					<tr>
+						<h1>Connect your Facebook account</h1>
+					<td colspan="2">Login using your existing login to connect<br>your Facebook account.<br/><br/></td>
+					{{ form.as_table }}
+					</tr>
+					<tr>
+					<th></th>
+					<td><br/><input type="submit" class="submitform"  value="Submit"><br/><br/></td>
+					</tr>
+					{%endif%}
+					{%if show_terms%}
+					<tr>
+					<h1>Welcome {{facebook_profile.first_name }} </h1>
+					<td colspan='2'>By using this site, you agree to its <a href="/terms" target="_blank" class="blue">Terms and Conditions</a></td>
+				    </tr>
+				    
+					<tr>
+					<th></th>
+					<td><br/><input type="submit" class="submitform"  value="Agree"><br/><br/></td>
+					</tr>
+									    
+					{%endif%}
+					{% if show_fblink %}
+					<tr>
+					<td colspan='2'>Already a member?<br><a href='{% url fblink %}?next={{next}}' class="blue">Connect your Facebook Account</a></td>
+					</tr>
+					
+					{%endif%}
+				</table>
+		 	</div>
+            <div class="grid_4" style="border:1px solid #000000;">
+                <b>Friends already using this site</b><br>
+                <fb:login-button show-faces="true" width="300" max-rows="4"></fb:login-button>
+            </div>
+
+ 		</form>
+		{% endblock content %}
